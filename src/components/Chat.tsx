@@ -1,8 +1,8 @@
 import { GET_USER_BY_EMAIL } from "@/apollo/query";
 // import { onMessage } from "@/apollo/subscription";
 import CircleContext from "@/controller/CircleController";
-import { useQuery, useSubscription } from "@apollo/client";
-import { useContext, useEffect, useState } from "react";
+import { useQuery } from "@apollo/client";
+import { useContext, useEffect } from "react";
 
 function Chat() {
   // const [chatMessages, setChatMessages] = useState([]);
