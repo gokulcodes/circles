@@ -1,34 +1,37 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+"use client";
 import "./globals.css";
+import { Host_Grotesk } from "next/font/google";
+import { ApolloProvider } from "@apollo/client";
+import apolloClient from "@/apollo/apolloClient";
+import CircleContext, {
+  initialState,
+  reducer,
+} from "@/controller/CircleController";
+import { useReducer } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Circles",
-  description:
-    "A text based distraction-free personal space for connecting with your closed circles.",
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [state, dispatch] = useReducer(reducer, initialState);
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <head>
+        <title>Circles</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="Circles - A social media platform" />
+        <link rel="icon" href="/favicon.ico" />
+      </head>
+      <body className={hostGrotesk.className}>
+        <ApolloProvider client={apolloClient}>
+          <CircleContext value={{ state, dispatch }}>{children}</CircleContext>
+        </ApolloProvider>
       </body>
     </html>
   );
