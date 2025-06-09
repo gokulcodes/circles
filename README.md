@@ -112,3 +112,19 @@ A text based distraction-free personal space for connecting with your closed cir
     - partial server side rendering
   - Vercel for hosting
   - Domain - circles.gokulcodes.dev
+
+Todo
+Online presence - realtime
+Last Seen mutation - realtime
+Typing Indicator - Done
+Friend Info
+Cancel Friend request
+Clear Chat history
+Emoji Picker
+Delete Message
+chatRoom List redesign
+
+CreateGroupChat
+Add members
+Remove members
+Leave group

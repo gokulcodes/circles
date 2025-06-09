@@ -17,12 +17,12 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const httpLink = new HttpLink({
-  uri: process.env.HTTP_SERVER,
+  uri: process.env.HTTP_SERVER || "http://localhost:4000/graphql",
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: process.env.WS_SERVER || "",
+    url: process.env.WS_SERVER || "ws://localhost:4000/graphql",
   })
 );
 
