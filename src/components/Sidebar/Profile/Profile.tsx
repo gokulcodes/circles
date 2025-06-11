@@ -14,12 +14,16 @@ import { useMutation, useQuery } from "@apollo/client";
 import { GET_USER_BY_EMAIL } from "@/apollo/query";
 import { useRouter } from "next/navigation";
 import { UPDATE_USER_STATUS } from "@/apollo/mutation";
+import clsx from "clsx";
 
-export default function Profile(props: { ref: RefObject<HTMLDivElement> }) {
+export default function Profile(props: {
+  ref: RefObject<HTMLDivElement | null>;
+}) {
   const { state, dispatch } = useContext(CircleContext);
   const router = useRouter();
   const userInfo = useQuery(GET_USER_BY_EMAIL);
   const [updateUserStatus] = useMutation(UPDATE_USER_STATUS);
+
   const [showFullDetails, setShowFullDetails] = useState(false);
   const { user } = state;
 
@@ -38,58 +42,59 @@ export default function Profile(props: { ref: RefObject<HTMLDivElement> }) {
     });
   }, [userInfo]);
 
-  const handleLastActivityUpdate = useCallback(async () => {
-    // console.log(user, user?.isOnline, user?.lastSeen);
-    // if (!user?.isOnline && user?.lastSeen) {
-    //   await updateUserStatus({
-    //     variables: {
-    //       isOnline: true, // if last activity is less than 1mins, make online to true
-    //       lastSeen: Date.now().toString(),
-    //     },
-    //   });
-    // }
+  const inactivityScheduler = useCallback(
+    scheduleUserStatusUpdate(updateUserStatus),
+    []
+  );
+  const { cancelInterval, schedule } = inactivityScheduler();
+
+  async function handleUserStatusUpdate() {
+    /**
+     *
+     * There are two intervals running in parallel with different time differences
+     * THis two is arbitary, it can grow exponentially
+     */
+    if (!user?.isOnline) {
+      await updateUserStatus({
+        variables: {
+          isOnline: true, // if last activity is less than 1mins, make online to true
+          lastSeen: Date.now().toString(),
+        },
+      });
+    }
+    schedule(state.lastActivityTime);
+  }
+
+  useEffect(() => {
+    handleUserStatusUpdate();
+  }, [state.lastActivityTime]);
+
+  function handleLastActivityUpdate() {
     dispatch({
       type: "UPDATE_LAST_ACTIVITY_TIME",
       payload: { ...state, lastActivityTime: Date.now() },
     });
-  }, [state, user]);
+  }
+  const debouncedMouseMoveHandler = debounce(handleLastActivityUpdate);
 
   useEffect(() => {
-    const inactivityScheduler = scheduleUserStatusUpdate(
-      state.lastActivityTime,
-      updateUserStatus
-    );
-    inactivityScheduler();
+    document.body.addEventListener("mousemove", debouncedMouseMoveHandler);
+    return () => {
+      cancelInterval();
+      document.body.removeEventListener("mousemove", debouncedMouseMoveHandler);
+    };
   }, []);
 
-  useEffect(() => {
-    document.body.addEventListener(
-      "scroll",
-      debounce(handleLastActivityUpdate)
-    );
-    document.body.addEventListener(
-      "mousemove",
-      debounce(handleLastActivityUpdate)
-    );
-    return () => {
-      document.body.removeEventListener(
-        "scroll",
-        debounce(handleLastActivityUpdate)
-      );
-      document.body.removeEventListener(
-        "mousemove",
-        debounce(handleLastActivityUpdate)
-      );
-    };
-  }, [state]);
-
   function handleShowDetails() {
+    if (!props.ref.current) {
+      return;
+    }
     if (showFullDetails) {
       const profileRef = props.ref.current as HTMLDivElement;
-      profileRef.style.height = `${window.innerHeight / 4}px`;
-      props.ref.current.style.height = `${window.innerHeight / 8}px`;
+      profileRef.style.height = `${window.innerHeight / 9}px`;
+      props.ref.current.style.height = `${window.innerHeight / 5}px`;
     } else {
-      props.ref.current.style.height = `${window.innerHeight}px`;
+      props.ref.current.style.height = `${window.innerHeight + 100}px`;
     }
     setShowFullDetails(!showFullDetails);
   }
@@ -113,28 +118,38 @@ export default function Profile(props: { ref: RefObject<HTMLDivElement> }) {
       type: "UPDATE_MODAL",
       payload: { ...state, modalName: "DELETE_ACCOUNT" },
     });
+    handleLogout();
   }
 
   function handleLogout() {
     dispatch({
-      type: "SET_USER",
-      payload: { ...state, user: null },
+      type: "RESET_STATE",
+      payload: { ...state },
     });
     localStorage.clear();
+    // window.location.reload();
     router.push("/login");
   }
 
   if (!user) {
     return;
   }
+  // console.log(state);
   // console.log(user);
   return (
     <div
       ref={props.ref}
-      className="flex w-10/12 lg:w-full overflow-hidden flex-col gap-6 items-center justify-end h-1/6 bg-background border-l border-t lg:border p-4 lg:rounded-2xl border-white/20 lg:mb-2 lg:mr-2"
+      className="flex w-10/12 lg:w-full overflow-hidden flex-col gap-4 items-start justify-end h-1/5 bg-background border-l border-t lg:border p-4 lg:rounded-2xl border-white/20 lg:mb-2 lg:mr-2"
     >
-      {showFullDetails ? (
-        <div className="flex h-full w-full flex-col">
+      <Image
+        src="/logo_name.png"
+        alt="Circles Logo"
+        width={100}
+        height={100}
+        className="opacity-80 w-28"
+      />
+      {showFullDetails && (
+        <div className="flex h-full w-full flex-col mb-2">
           <div className=" flex flex-row w-full items-center">
             <div className="flex flex-col p-4 items-start gap-2 ">
               <p className="uppercase opacity-60 text-sm tracking-widest">
@@ -188,7 +203,7 @@ export default function Profile(props: { ref: RefObject<HTMLDivElement> }) {
             </button>
           </div>
         </div>
-      ) : null}
+      )}
       <div className="flex relative flex-row w-full items-center gap-4">
         <div className="rounded-2xl border-4 border-secondary relative">
           <Image
@@ -199,20 +214,19 @@ export default function Profile(props: { ref: RefObject<HTMLDivElement> }) {
             height={100}
           />
           <div
-            className={`w-2 h-2 lg:w-4 lg:h-4 rounded-lg absolute -right-1 -bottom-1 ${
-              user.isOnline ? "bg-green-400" : "bg-yellow-400"
-            } `}
+            className={clsx(
+              "w-2 h-2 lg:w-4 lg:h-4 rounded-lg absolute -right-1 -bottom-1 ",
+              {
+                "bg-green-400": user.isOnline,
+                "bg-yellow-400": !user.isOnline,
+              }
+            )}
           />
         </div>
         <div className="flex flex-col items-start">
           <h2 className="font-bold text-lg lg:text-xl">{user.username}</h2>
           <p className="opacity-50 text-sm lg:text-base font-extralight">
-            {
-              user.isOnline
-                ? "Online"
-                : new Date(parseInt(user.lastSeen)).toTimeString().slice(0, 8)
-              // getRelativeTime(user.lastSeen)
-            }
+            {user.isOnline ? "Online" : getRelativeTime(user.lastSeen)}
           </p>
         </div>
         <button

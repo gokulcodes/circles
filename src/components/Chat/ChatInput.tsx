@@ -25,6 +25,9 @@ export default function ChatInput() {
   }
 
   const handleKeyUp = debounce(async () => {
+    if (!isTypingRef.current) {
+      return;
+    }
     isTypingRef.current = false;
     await updateTyping({
       variables: {
@@ -39,17 +42,18 @@ export default function ChatInput() {
     const formInput = event.target as HTMLFormElement;
     const formData = new FormData(formInput);
     const content = formData.get("message");
+    formInput.reset();
     await sendMessage({
       variables: {
         roomId: state.currentChatRoom?.chatRoomId,
         content: content,
       },
     });
-    formInput.reset();
   }
+
   return (
     <form
-      className="absolute z-50 bottom-14 lg:bottom-0 p-4 w-full bg-background/40 backdrop-blur-2xl rounded-b-2xl border-t border-white/10 right-0 flex gap-4"
+      className="absolute z-50 bottom-0 lg:bottom-0 p-4 w-full bg-background/40 backdrop-blur-2xl rounded-b-2xl border-t border-white/10 right-0 flex gap-4"
       onSubmit={handleMessageSend}
     >
       <div className=" w-full flex gap-4">
@@ -58,9 +62,9 @@ export default function ChatInput() {
           className="p-3 rounded-xl bg-white/5 border border-white/10 w-full outline-none focus-within:border-primary"
           name="message"
           onKeyDown={() => handleUpdateTyping()}
-          onKeyUp={handleKeyUp}
+          onKeyUp={() => handleKeyUp()}
           type="text"
-          placeholder="Typing anything..."
+          placeholder="Type anything..."
         />
         <button className="flex bg-primary hover:brightness-110 px-4 lg:px-8 cursor-pointer text-center items-center gap-2 rounded-xl">
           <BiSend className="text-2xl lg:text-lg" />

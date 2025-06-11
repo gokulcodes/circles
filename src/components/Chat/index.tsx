@@ -4,41 +4,41 @@ import ChatInput from "./ChatInput";
 import Chat from "./Chat";
 import CircleContext from "@/controller/CircleController";
 import Image from "next/image";
-// import { useSubscription } from "@apollo/client";
-// import { USER_ACTIVITY } from "@/apollo/subscription";
 
 function ChatWindow(props: { ref: Ref<HTMLDivElement> }) {
   const { state } = useContext(CircleContext);
-  // const onActive = useSubscription(USER_ACTIVITY);
-  // if (!state.currentChatRoom) {
-  //   return;
-  // }
+
+  if (!state.currentChatRoom) {
+    return (
+      <div
+        ref={props.ref}
+        className="lg:border py-4 rounded-2xl h-full lg:h-[98.5vh] lg:border-white/20 lg:ml-2 lg:my-2 mb-10 w-full relative"
+      >
+        <div className="flex w-full gap-4 items-center justify-center h-full flex-col">
+          <Image
+            src="/logo_name.png"
+            alt="Circles Logo"
+            width={100}
+            height={100}
+            className="opacity-80 w-48"
+          />
+          <p className="font-extralight opacity-60 lg:w-4/12 w-11/12 text-center">
+            A text based distraction-free personal space for connecting with
+            your closed circles.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       ref={props.ref}
-      className="lg:border py-4 rounded-2xl h-full lg:h-[99.2vh] lg:border-white/20 lg:ml-2 lg:my-2 mb-10 w-full relative"
+      className="lg:border py-4 rounded-2xl h-full lg:h-[98.5vh] lg:border-white/20 lg:ml-2 lg:my-2 mb-10 w-full relative"
     >
-      {state.currentChatRoom ? (
-        <>
-          <ChatHeader />
-          <Chat />
-          <ChatInput />
-        </>
-      ) : (
-        <div className="flex w-full gap-2 items-center justify-center h-full flex-col">
-          <Image
-            src="/logo_flat.png"
-            alt="Circles Logo"
-            width={100}
-            height={100}
-            className="opacity-80"
-          />
-          <p className="font-extralight opacity-60 w-8/12 text-center">
-            Open the sidebar to add and chat with your closest people.
-          </p>
-        </div>
-      )}
+      <ChatHeader />
+      <Chat />
+      <ChatInput />
     </div>
   );
 }

@@ -108,8 +108,11 @@ export default function Signup() {
   };
 
   return (
-    <div className="w-full h-[100vh] flex items-center justify-center">
-      <div className="lg:w-1/3 md:w-1/2 w-11/12 bg-white/5 border border-white/10 rounded-2xl">
+    <div
+      id="signup"
+      className="w-full h-[100vh] flex items-center justify-center"
+    >
+      <div className="lg:w-1/2 2xl:w-1/4 animate-openup shadow-2xl md:w-1/2 w-11/12 bg-background/80 backdrop-blur-lg border border-white/10 rounded-2xl">
         <div className="p-8">
           <div className="flex flex-col items-center justify-center w-full">
             <Image
@@ -117,13 +120,13 @@ export default function Signup() {
               alt="Circles Logo"
               width={100}
               height={100}
-              className="mx-auto mb-6"
+              className="mx-auto scale-90 lg:scale-100 transition-all hover:scale-90 transform cursor-pointer drop-shadow-[0_25px_45px_rgba(88,124,255,0.25)] drop-shadow-primary mb-6"
             />
             <div className="flex flex-col items-center justify-center gap-2 mb-6">
               <h1 className="text-2xl text-center font-bold text-white">
                 Welcome to Circles
               </h1>
-              <p className="text-white/60 font-extralight text-center text-xl">
+              <p className="text-white/60 font-extralight text-center text-base lg:text-xl">
                 Create your account to join Circles and connect with your closes
                 ones.
               </p>

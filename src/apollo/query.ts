@@ -20,6 +20,16 @@ export const GET_FRIEND_REQUEST = gql`
     getAllFriendRequest {
       sender
       receiver
+      receiverInfo {
+        username
+        email
+        about
+        profilePicture
+        isOnline
+        lastSeen
+        createdAt
+        updatedAt
+      }
       senderInfo {
         username
         email

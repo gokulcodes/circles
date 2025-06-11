@@ -9,6 +9,7 @@ import CircleContext, {
 } from "@/controller/CircleController";
 import { useReducer } from "react";
 import Modal from "@/components/Modal/Modal";
+import { ReactScan } from "@/components/ReactScan";
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
         <meta name="description" content="Circles - A social media platform" />
         <link rel="icon" href="/favicon.ico" />
       </head>
+      <ReactScan />
       <body style={{ overflow: "hidden" }} className={hostGrotesk.className}>
         <ApolloProvider client={apolloClient}>
           <CircleContext value={{ state, dispatch }}>

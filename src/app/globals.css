@@ -13,11 +13,13 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-hostGrotesk);
-  --color-primary: #6989ff;
+  --color-primary: #587cff;
   --color-background: #141414;
   --color-secondary: #2d353d;
   --animate-openup: openup 0.3s ease-in-out;
+  --animate-openRight: openRight 0.3s ease-in-out;
   --animate-sidebarOpen: sidebarOpen 0.4s ease-in-out;
+  --animate-pop: pop 0.2s ease-in-out;
   @keyframes sidebarOpen {
     0% {
       opacity: 0;
@@ -30,6 +32,16 @@
       transform-origin: right;
     }
   }
+  @keyframes openRight {
+    0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+  }
   @keyframes openup {
     0% {
       opacity: 0;
@@ -38,6 +50,16 @@
     100% {
       opacity: 1;
       transform: translateY(0px);
+    }
+  }
+  @keyframes pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 }
@@ -58,9 +80,29 @@ body {
   display: none;
 }
 
+#reaction-card * {
+  transition: all 0.3s ease-in-out;
+}
+
+#chatHeader * {
+  transition: all 0.2s ease;
+}
+
 /* #chatRender {
   /* background-color: rgba(0, 0, 0, 1); Semi-transparent white color */
 /* background-image: url("/chatbg.png");
   background-size: cover; */
 /* background-blend-mode: multiply; */
 /* }  */
+
+#login {
+  background-image: url("/auth_bg.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#signup {
+  background-image: url("/auth_bg.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}

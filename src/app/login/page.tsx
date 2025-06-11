@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState, useContext } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-// import { useContext } from "react";
-
 export default function Login() {
   const { state, dispatch } = useContext(CircleContext);
   const router = useRouter();
@@ -83,10 +81,13 @@ export default function Login() {
       console.log(error);
     }
   };
-
+  // console.log("login", state);
   return (
-    <div className="w-full h-[100vh] flex items-center justify-center">
-      <div className="lg:w-1/3 md:w-1/2 w-11/12 bg-white/5 border border-white/10 rounded-2xl">
+    <div
+      id="login"
+      className="w-full h-[100vh] bg-blend-multiply flex items-center justify-center"
+    >
+      <div className="lg:w-1/2 2xl:w-1/4 animate-openup shadow-2xl md:w-1/2 w-11/12 bg-background/80 backdrop-blur-lg border border-white/10 rounded-2xl">
         <div className="p-8">
           <div className="flex flex-col items-center justify-center w-full">
             <Image
@@ -94,13 +95,13 @@ export default function Login() {
               alt="Circles Logo"
               width={100}
               height={100}
-              className="mx-auto mb-6"
+              className="mx-auto scale-90 lg:scale-100 transition-all hover:scale-90 transform cursor-pointer drop-shadow-[0_25px_45px_rgba(88,124,255,0.25)] drop-shadow-primary mb-6"
             />
             <div className="flex flex-col items-center justify-center gap-2 mb-6">
               <h1 className="text-2xl text-center font-bold text-white">
                 Welcome Back!
               </h1>
-              <p className="text-white/60 font-extralight text-center text-xl">
+              <p className="text-white/60 font-extralight text-center text-base lg:text-xl">
                 Log in to Circles and reconnect with the people who matter most.
               </p>
             </div>
@@ -124,7 +125,7 @@ export default function Login() {
               aria-label="email"
               onChange={(event) => emailValidation(event.target.value)}
               placeholder="Email Address"
-              className="w-full mt-2 outline-none focus-within:border-primary p-4 mb-4 bg-transparent border border-white/20 rounded-lg text-white"
+              className="w-full bg-background mt-2 outline-none focus-within:border-primary p-4 mb-4 border border-white/20 rounded-lg text-white"
             />
             <div className="relative ">
               <label
@@ -149,7 +150,7 @@ export default function Login() {
                 onChange={(event) => passwordValidation(event.target.value)}
                 aria-label="password"
                 placeholder="Password"
-                className="w-full mt-2 outline-none focus-within:border-primary p-4 mb-4 bg-transparent border border-white/20 rounded-lg text-white"
+                className="w-full bg-background mt-2 outline-none focus-within:border-primary p-4 mb-4 border border-white/20 rounded-lg text-white"
               />
               <button
                 type="button"

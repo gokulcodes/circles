@@ -2,6 +2,7 @@ import { UPDATE_ABOUT } from "@/apollo/mutation";
 import CircleContext from "@/controller/CircleController";
 import { useMutation } from "@apollo/client";
 import { useContext, useRef } from "react";
+import Image from "next/image";
 
 export default function UpdateAbout() {
   const [updateAbout, { loading, data, error }] = useMutation(UPDATE_ABOUT);
@@ -58,11 +59,13 @@ export default function UpdateAbout() {
           className="px-10 py-3 cursor-pointer rounded-xl hover:brightness-110 bg-primary"
         >
           {loading ? (
-            <img
-              loading="lazy"
+            <Image
               className="w-7"
               src="/loader.svg"
               alt="loading"
+              width={28}
+              height={28}
+              priority={false}
             />
           ) : (
             "Submit"

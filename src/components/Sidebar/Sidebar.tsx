@@ -1,12 +1,10 @@
-import { Ref, useContext, useRef } from "react";
+import { memo, Ref, useContext, useRef } from "react";
 import RoomList from "./ChatRooms/RoomList";
 import Profile from "./Profile/Profile";
-// import { IoChatbubblesSharp } from "react-icons/io5";
-// import { MdPerson } from "react-icons/md";
 import CircleContext from "@/controller/CircleController";
 import { FiSidebar } from "react-icons/fi";
 
-export default function Sidebar(props: { sideBarRef: Ref<HTMLDivElement> }) {
+const Sidebar = memo((props: { sideBarRef: Ref<HTMLDivElement> }) => {
   const { state, dispatch } = useContext(CircleContext);
   const mouseDown = useRef<boolean>(false);
   const chatRoomRef = useRef<HTMLDivElement>(null);
@@ -40,9 +38,9 @@ export default function Sidebar(props: { sideBarRef: Ref<HTMLDivElement> }) {
 
   return (
     <div
+      id="sidebar"
       onMouseMove={handleResize}
       onMouseUp={handleMouseUp}
-      id="sidebar"
       ref={props.sideBarRef}
       className="flex animate-sidebarOpen absolute items-end bg-background/60 backdrop-blur-2xl z-50 lg:static lg:ml-2 ml-0 flex-col w-full right-0 h-full lg:w-1/3 "
     >
@@ -52,14 +50,6 @@ export default function Sidebar(props: { sideBarRef: Ref<HTMLDivElement> }) {
       >
         <FiSidebar className="text-xl" />
       </button>
-      {/* <button className="flex bg-radial-[at_50%_5%] from-sky-200 via-blue-400/40 to-transparent via-10% to-80% items-center border-t border-primary text-primary justify-center gap-2 cursor-pointer w-full">
-        <IoChatbubblesSharp />
-        Chats
-      </button>
-      <button className="flex bg-radial-[at_50%_5%] from-sky-200 via-blue-400/40 to-transparent via-10% to-80% items-center border-t border-primary text-primary justify-center gap-2 cursor-pointer w-full">
-        <MdPerson />
-        Profile
-      </button> */}
       <RoomList ref={chatRoomRef} />
       <button
         onMouseDown={handleMouseDown}
@@ -70,4 +60,8 @@ export default function Sidebar(props: { sideBarRef: Ref<HTMLDivElement> }) {
       <Profile ref={profileRef} />
     </div>
   );
-}
+});
+
+Sidebar.displayName = "Sidebar";
+
+export default Sidebar;

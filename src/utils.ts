@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { User } from "./types";
 
 export function getRelativeTime(date: string | undefined) {
   if (!date) {
@@ -31,32 +31,38 @@ export function getChatMessageTimeFormat(date: string) {
 }
 
 export function scheduleUserStatusUpdate(
-  lastActivityTime: number,
-  updateUserStatus: ReturnType<typeof useMutation>[0]
-): Function {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  updateUserStatus: Function
+) {
   const ONE_MINUTE = 1000 * 60;
-  let timerId: ReturnType<typeof setTimeout> | null = null,
-    cnt = 0;
+  let timerId: ReturnType<typeof setInterval> | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  return (): { cancelInterval: Function; schedule: Function } => {
+    return {
+      cancelInterval: () => {
+        if (timerId) {
+          clearInterval(timerId);
+        }
+      },
+      schedule: (lastActivityTime: number) => {
+        if (timerId) {
+          clearInterval(timerId);
+        }
+        timerId = setInterval(async () => {
+          const timeDiff = (Date.now() - lastActivityTime) / 60000; // diff in minutes
+          const isActive = timeDiff <= 3;
 
-  return () => {
-    if (timerId) {
-      clearTimeout(timerId);
-    }
-    console.log("timers", ++cnt);
-    timerId = setInterval(async () => {
-      const timeDiff = (Date.now() - lastActivityTime) / 60000; // diff in minutes
-      const isActive = timeDiff <= 1;
-
-      await updateUserStatus({
-        variables: {
-          isOnline: isActive, // if last activity is less than 1mins, make online to true
-          lastSeen:
-            timeDiff > 1 // five minutes
-              ? lastActivityTime.toString()
-              : Date.now().toString(),
-        },
-      });
-    }, 2 * ONE_MINUTE);
+          await updateUserStatus({
+            variables: {
+              isOnline: isActive, // if last activity is less than 3mins, make online to true
+              lastSeen: isActive
+                ? Date.now().toString()
+                : lastActivityTime.toString(),
+            },
+          });
+        }, 2 * ONE_MINUTE);
+      },
+    };
   };
 }
 
@@ -68,6 +74,25 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T) {
     }
     timerId = setTimeout(() => {
       func(...args);
-    }, 2000);
+    }, 5000);
   };
+}
+
+export function getCharCode(username: string) {
+  return username[0].charCodeAt(0) * 10;
+}
+
+export function getOtherUsersFromRoom(
+  members: Array<{ user: User; isTyping: boolean }>,
+  myEmail: string | undefined
+) {
+  if (!myEmail || !members || !members.length) {
+    return null;
+  }
+
+  const otherUsers = members.filter(({ user }) => user.email !== myEmail);
+  if (otherUsers.length) {
+    return otherUsers.at(0); // for now we support only 1:1 chats, so there can be atmost 1 user other than me
+  }
+  return null;
 }

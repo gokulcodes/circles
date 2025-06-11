@@ -18,7 +18,7 @@ export default function AddFriend() {
       className="p-3 border flex items-center justify-center gap-2 cursor-pointer hover:text-primary border-white/10 text-center rounded-xl"
     >
       <IoPersonAdd />
-      Add Friend
+      Invite Friend
     </button>
   );
 }

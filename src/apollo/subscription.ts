@@ -55,3 +55,32 @@ export const ROOM_ACTIVITY = gql`
     }
   }
 `;
+
+export const FRIEND_REQUEST_ACTIVITES = gql`
+  subscription FriendRequestActivities($email: String!) {
+    friendRequestActivities(email: $email) {
+      sender
+      receiver
+      receiverInfo {
+        username
+        email
+        about
+        profilePicture
+        isOnline
+        lastSeen
+        createdAt
+        updatedAt
+      }
+      senderInfo {
+        username
+        email
+        about
+        profilePicture
+        isOnline
+        lastSeen
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;

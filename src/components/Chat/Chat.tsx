@@ -1,103 +1,91 @@
-import { memo, useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import CircleContext from "@/controller/CircleController";
-import type { Message, User } from "@/controller/CircleController";
-import { useLazyQuery, useSubscription } from "@apollo/client";
-import { LISTEN_CHAT_ROOM, ROOM_ACTIVITY } from "@/apollo/subscription";
-import { GET_MESSAGE_BY_ROOM_ID } from "@/apollo/query";
-import { getChatMessageTimeFormat } from "@/utils";
-
-const Message = memo((props: { messageInfo: Message; myInfo: User | null }) => {
-  const messageInfo = props.messageInfo;
-  const myInfo = props.myInfo;
-  if (!myInfo) {
-    return;
-  }
-
-  const isMyMessage = messageInfo.sender === myInfo.email;
-  return (
-    <div
-      className={`flex ${
-        isMyMessage ? "flex-row-reverse" : "flex-row"
-      } mx-4 gap-2`}
-    >
-      <div
-        className={`px-4 py-2  flex border gap-2 backdrop-blur-2xl text-white items-end ${
-          isMyMessage
-            ? "rounded-l-2xl bg-secondary/40 border-transparent"
-            : "rounded-r-2xl border-secondary"
-        }   rounded-b-2xl`}
-      >
-        <p className="font-extralight text-sm lg:text-lg break-all">
-          {messageInfo.content}
-        </p>
-        <span className="text-xs opacity-60">
-          {getChatMessageTimeFormat(messageInfo.createdAt)}
-        </span>
-      </div>
-    </div>
-  );
-});
-Message.displayName = "Message";
+import { useSubscription } from "@apollo/client";
+import { ROOM_ACTIVITY } from "@/apollo/subscription";
+import Message from "./Message";
+import { RoomActivityType } from "@/types";
+import { getOtherUsersFromRoom } from "@/utils";
+import Image from "next/image";
 
 function Chat() {
   const { state, dispatch } = useContext(CircleContext);
   const chatRenderRef = useRef<HTMLDivElement>(null);
-
-  const onUpdate = useSubscription(LISTEN_CHAT_ROOM, {
-    variables: { roomId: state.currentChatRoom?.chatRoomId },
-  });
+  const { currentChatRoom } = state;
 
   const onRoomActivity = useSubscription(ROOM_ACTIVITY, {
-    variables: { roomId: state.currentChatRoom?.chatRoomId },
-  });
-
-  const [getMessagesByRoom, { data }] = useLazyQuery(GET_MESSAGE_BY_ROOM_ID, {
-    variables: { roomId: state.currentChatRoom?.chatRoomId },
-    fetchPolicy: "network-only",
+    variables: { roomId: currentChatRoom?.chatRoomId },
   });
 
   useEffect(() => {
-    getMessagesByRoom();
-    if (!data?.getMessagesByRoom?.length) {
-      return;
+    function handleRoomUpdate(room: RoomActivityType) {
+      if (!room || !room._id) {
+        return;
+      }
+      const friendMetadata = getOtherUsersFromRoom(
+        room.members,
+        state.user?.email
+      );
+      if (!friendMetadata) {
+        return;
+      }
+      // members will return all users from the room
+      const formatedRoomData = {
+        friend: {
+          info: friendMetadata.user,
+          isTyping: friendMetadata.isTyping,
+        },
+        chatRoomId: room._id,
+        chatRoomName: room.name,
+        chatRoomPicture: "/circles.svg",
+      };
+      dispatch({
+        type: "SET_CURRENT_CHAT_ROOM",
+        payload: { ...state, currentChatRoom: formatedRoomData },
+      });
     }
-    dispatch({
-      type: "SET_MESSAGES",
-      payload: { ...state, messages: data.getMessagesByRoom },
-    });
-  }, [onUpdate.data?.broadcast, data]);
-
-  function handleRoomUpdate(room) {
-    if (!room?._id) {
-      return;
-    }
-    const Room = {
-      isGroupChat: false,
-      users: room?.members.filter(
-        (user) => user.user.email !== state.user?.email
-      ),
-      chatRoomId: room?._id,
-      chatRoomName: room?.name,
-      chatRoomPicture: "/circles.svg",
-    };
-    dispatch({
-      type: "SET_CURRENT_CHAT_ROOM",
-      payload: { ...state, currentChatRoom: Room },
-    });
-  }
-
-  useEffect(() => {
     if (!onRoomActivity.loading && onRoomActivity.data) {
+      console.log("onRoomActivity");
       handleRoomUpdate(onRoomActivity.data?.roomActivity);
     }
-  }, [onRoomActivity.data]);
+  }, [onRoomActivity, dispatch]);
 
   useEffect(() => {
     if (!chatRenderRef.current) {
       return;
     }
-    chatRenderRef.current.scrollTop = chatRenderRef.current?.scrollHeight;
-  }, [state.messages]);
+    chatRenderRef.current.scrollTop = chatRenderRef.current?.scrollHeight + 10;
+  }, [state.messages, state.currentChatRoom]);
+
+  if (!currentChatRoom) {
+    return;
+  }
+
+  const isTyping = currentChatRoom.friend.isTyping;
+
+  if (!state.messages.length) {
+    return (
+      <div
+        ref={chatRenderRef}
+        id="chatRender"
+        className="flex flex-col h-full overflow-scroll py-20 lg:pb-20 pb-34 gap-2"
+      >
+        <div className="flex w-full gap-2 items-center justify-center h-full flex-col">
+          <Image
+            src="/message-empty.gif"
+            alt="Circles Logo"
+            width={100}
+            unoptimized
+            height={100}
+            className="opacity-80 w-24"
+          />
+          <p className="-mt-2 font-extralight opacity-60 lg:w-4/12 w-11/12 flex flex-col items-center justify-center text-center">
+            <span>{`Time to say hello to ${currentChatRoom.friend.info.username}!`}</span>
+            <span>{`Send over a "Hi" to kick things off.`}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -108,6 +96,23 @@ function Chat() {
       {state.messages.map((message) => (
         <Message key={message._id} messageInfo={message} myInfo={state.user} />
       ))}
+      <div>
+        {isTyping && (
+          <div
+            style={{ width: "fit-content" }}
+            className="px-6 animate-openup ml-4 relative py-2 group max-w-10/12 lg:max-w-1/2 flex flex-col  border gap-1 backdrop-blur-2xl text-white rounded-b-2xl rounded-r-2xl border-secondary items-start"
+          >
+            <Image
+              className="w-7"
+              src="/typing.svg"
+              alt="loading"
+              width={28}
+              height={28}
+              priority={false}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

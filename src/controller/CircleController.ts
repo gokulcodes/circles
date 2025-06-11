@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { CircleAction, CircleState } from "../types";
 
 export const initialState: CircleState = {
   user: null,
@@ -13,53 +14,8 @@ export const initialState: CircleState = {
   modalName: "",
 };
 
-export type User = {
-  username: string;
-  email: string;
-  about: string;
-  profilePicture: string;
-  isOnline: boolean;
-  isTyping: boolean;
-  lastSeen: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type ChatRoom = {
-  isGroupChat: boolean;
-  users: User[];
-  chatRoomId: string;
-  chatRoomName: string;
-  chatRoomPicture: string;
-};
-
-export type Message = {
-  _id: string;
-  sender: string;
-  content: string;
-  chatRoomId: string;
-  createdAt: string;
-};
-
-type CircleState = {
-  user: User | null;
-  sidebarExpanded: boolean;
-  chatRooms: ChatRoom[];
-  lastActivityTime: number;
-  currentChatRoom: ChatRoom | null;
-  messages: Message[];
-  modalName: string;
-  isTyping: boolean;
-  isOnline: boolean;
-  lastSeen: number;
-};
-
-type CircleAction = {
-  type: string;
-  payload: CircleState;
-};
-
 export const reducer = (state: CircleState, action: CircleAction) => {
+  console.log("state update", action);
   switch (action.type) {
     case "SET_USER":
       return { ...state, user: action.payload.user };
@@ -75,8 +31,10 @@ export const reducer = (state: CircleState, action: CircleAction) => {
       return { ...state, lastActivityTime: action.payload.lastActivityTime };
     case "SIDE_BAR_EXPAND":
       return { ...state, sidebarExpanded: action.payload.sidebarExpanded };
+    case "RESET_STATE":
+      return initialState;
     default:
-      return state;
+      return initialState;
   }
 };
 

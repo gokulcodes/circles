@@ -117,14 +117,16 @@ Todo
 Online presence - realtime
 Last Seen mutation - realtime
 Typing Indicator - Done
-Friend Info
-Cancel Friend request
-Clear Chat history
-Emoji Picker
-Delete Message
+Friend Info - Done
+Cancel Friend request - Done
+Clear Chat history - Done
+Emoji Picker - Done
+Delete Message - Done
 chatRoom List redesign
 
 CreateGroupChat
 Add members
 Remove members
 Leave group
+
+Render Optimization

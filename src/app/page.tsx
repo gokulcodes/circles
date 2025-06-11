@@ -5,7 +5,7 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 import CircleContext from "@/controller/CircleController";
 import { useSubscription } from "@apollo/client";
 import Image from "next/image";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useMemo, useRef } from "react";
 import { FiSidebar } from "react-icons/fi";
 
 export default function Home() {
@@ -22,6 +22,11 @@ export default function Home() {
   useEffect(() => {
     if (onUserActivityChange.data) {
       const updatedUserInfo = onUserActivityChange.data.userActivityStatus;
+      if (!updatedUserInfo) {
+        return;
+      }
+      console.log("updatedUserInfo update", updatedUserInfo);
+
       dispatch({
         type: "SET_USER",
         payload: { ...state, user: updatedUserInfo },
@@ -52,7 +57,10 @@ export default function Home() {
       payload: { ...state, sidebarExpanded: !state.sidebarExpanded },
     });
   }
-
+  const SideBarMemo = useMemo(
+    () => <Sidebar sideBarRef={sideBarRef} />,
+    [sideBarRef]
+  );
   return (
     <div
       onMouseMove={handleChatResize}
@@ -81,7 +89,7 @@ export default function Home() {
       >
         <div className="w-[1px] group-hover:flex hidden h-[100vh] bg-primary" />
       </button>
-      <Sidebar sideBarRef={sideBarRef} />
+      {SideBarMemo}
     </div>
   );
 }

@@ -131,3 +131,45 @@ export const UPDATE_TYPING = gql`
     }
   }
 `;
+
+export const CLEAR_HISTORY = gql`
+  mutation ClearHistory($roomId: String!) {
+    clearHistory(roomId: $roomId)
+  }
+`;
+
+export const DELETE_MESSAGE = gql`
+  mutation DeleteMessage($messageId: ID!) {
+    deleteMessage(messageId: $messageId)
+  }
+`;
+
+export const CANCEL_FRIEND_REQUEST = gql`
+  mutation CancelFriendRequest($friendEmail: String!) {
+    cancelFriendRequest(friendEmail: $friendEmail)
+  }
+`;
+
+export const DECLINE_FRIEND_REQUEST = gql`
+  mutation DeclineFriendRequest($friendEmail: String!) {
+    declineFriendRequest(friendEmail: $friendEmail)
+  }
+`;
+
+export const SEND_REACTION_TO_MESSAGE = gql`
+  mutation SendReactionToMessage($messageId: ID!, $reaction: String!) {
+    sendReactionToMessage(messageId: $messageId, reaction: $reaction) {
+      _id
+      content
+      roomId
+      sender
+      createdAt
+      updatedAt
+      replyTo
+      reactions {
+        senderEmail
+        reactionString
+      }
+    }
+  }
+`;
