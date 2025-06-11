@@ -15,7 +15,6 @@ export const initialState: CircleState = {
 };
 
 export const reducer = (state: CircleState, action: CircleAction) => {
-  console.log("state update", action);
   switch (action.type) {
     case "SET_USER":
       return { ...state, user: action.payload.user };

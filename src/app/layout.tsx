@@ -27,6 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <title>Circles</title>
+        <link rel="manifest" href="/manifest.json" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content="Circles - A social media platform" />
         <link rel="icon" href="/favicon.ico" />
