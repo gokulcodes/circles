@@ -1,0 +1,27 @@
+{
+  "theme_color": "#121212",
+  "background_color": "#121212",
+  "icons": [
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "icon512_maskable.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "512x512",
+      "src": "icon512_rounded.png",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "any",
+  "display": "standalone",
+  "dir": "auto",
+  "lang": "en-US",
+  "name": "Circles",
+  "short_name": "Circles",
+  "start_url": "/",
+  "scope": "/",
+  "description": "A text based distraction-free personal space for connecting with your closed circles."
+}
