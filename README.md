@@ -129,4 +129,4 @@ Add members
 Remove members
 Leave group
 
-Render Optimization
+Render Optimization.
